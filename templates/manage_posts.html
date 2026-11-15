@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Manage Posts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <a href="{{ url_for('home') }}" class="site-logo">
+            Off the Beaten Path
+        </a>
+
+        <nav class="top-nav">
+
+            <a href="{{ url_for('about') }}">About</a>
+
+            {% if session.get("username") %}
+
+            <div class="user-menu">
+
+                <button class="avatar-button">
+
+                    {% if session.get("username") == "Shien2" %}
+                    <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                    {% endif %}
+
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="{{ url_for('admin_new_post') }}">New Post</a>
+                    <a href="{{ url_for('manage_posts') }}">Manage Posts</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{{ url_for('login') }}">ログイン</a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+    <div class="manage-posts-page">
+
+        <h1>My Posts</h1>
+
+        {% if posts %}
+
+        {% for post in posts %}
+
+        <div class="manage-post-item">
+
+            <div class="manage-post-image">
+
+                {% if post.images %}
+                <img src="{{ url_for('static', filename='images/uploads/' + post.images.split(',')[0]) }}"
+                    alt="{{ post.title }}">
+                {% else %}
+                <div class="manage-no-image">
+                    No image
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="manage-post-info">
+                <strong>{{ post.title }}</strong>
+                <p>
+                    {{ post.country }} · {{ post.city }}
+                </p>
+            </div>
+
+            <div class="manage-post-actions">
+
+                <a href="{{ url_for('edit_post', post_id=post.id) }}">
+                    Edit
+                </a>
+
+                <form class="delete-form" action="{{ url_for('delete_post', post_id=post.id) }}" method="POST"
+                    style="display: inline;">
+                    <button type="button" class="delete-button">
+                        Delete
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        {% else %}
+
+        <p>No posts yet.</p>
+
+        {% endif %}
+
+    </div>
+    <!-- Delete confirmation modal -->
+    <div id="delete-modal" class="delete-modal">
+        <div class="delete-modal-box">
+
+            <h3>Delete this post?</h3>
+
+            <p>
+                This action cannot be undone.
+            </p>
+
+            <div class="delete-modal-actions">
+                <button type="button" id="cancel-delete">
+                    Cancel
+                </button>
+
+                <button type="button" id="confirm-delete">
+                    Delete
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const deleteModal = document.getElementById("delete-modal");
+        const cancelDeleteButton = document.getElementById("cancel-delete");
+        const confirmDeleteButton = document.getElementById("confirm-delete");
+
+        const deleteButtons = document.querySelectorAll(".delete-button");
+
+        let currentDeleteForm = null;
+
+        deleteButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                currentDeleteForm = button.closest(".delete-form");
+
+                deleteModal.classList.add("show");
+            });
+        });
+
+        cancelDeleteButton.addEventListener("click", function () {
+            deleteModal.classList.remove("show");
+            currentDeleteForm = null;
+        });
+
+        confirmDeleteButton.addEventListener("click", function () {
+            if (currentDeleteForm) {
+                currentDeleteForm.submit();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

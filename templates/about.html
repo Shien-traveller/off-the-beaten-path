@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>About | Off the Beaten Path</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <a href="{{ url_for('home') }}" class="site-logo">
+            Off the Beaten Path
+        </a>
+
+        <nav class="top-nav">
+
+            <a href="{{ url_for('about') }}" class="active">
+                About
+            </a>
+
+            {% if session.get("username") %}
+
+            <div class="user-menu">
+
+                <button class="avatar-button">
+
+                    {% if session.get("username") == "Shien2" %}
+                    <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                    {% endif %}
+
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="{{ url_for('admin_new_post') }}">New Post</a>
+                    <a href="{{ url_for('manage_posts') }}">Manage Posts</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{{ url_for('login') }}">ログイン</a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+
+    <section class="about-hero">
+
+        <div class="about-hero-overlay"></div>
+
+        <div class="about-hero-content">
+
+            <p class="about-label">
+                ABOUT
+            </p>
+
+            <h1 class="main-hero-title">
+                Built from the road,<br>
+                for the road.
+            </h1>
+
+            <p class="main-hero-description">
+                A place for travelers to share what<br>
+                guidebooks often leave out.
+            </p>
+
+        </div>
+
+    </section>
+
+    <section class="about-story">
+
+        <div class="about-story-inner">
+
+            <h2>About Off the Beaten Path</h2>
+
+            <div class="about-story-line"></div>
+
+            <div class="about-story-content">
+
+                <div class="about-story-image">
+                    <img src="{{ url_for('static', filename='images/about_trip.jpeg') }}" alt="Backpacking journey">
+                </div>
+
+                <div class="about-story-text">
+
+                    <p>
+                        <strong>Off the Beaten Path</strong> was created from a simple problem:
+                        travel information is easy to find for major tourist destinations, but much harder to find
+                        for smaller towns, rural areas, and less-visited places.
+                    </p>
+
+                    <p>
+                        In these areas, practical information about transportation, accommodation, food, routes,
+                        and places to visit is often scattered across different sources or difficult to find online.
+                        <strong>Off the Beaten Path</strong> aims to make this kind of practical travel knowledge
+                        easier to find and share.
+                    </p>
+
+                    <p>
+                        The site brings together useful local information such as transportation, accommodation,
+                        food, routes, lesser-known places, and other details that traditional travel guides often
+                        overlook.
+                        It is continuously improved based on user feedback and actual use.
+                    </p>
+
+                    <p>
+                        The goal of <strong>Off the Beaten Path</strong> is to create a useful platform where travelers
+                        can discover unfamiliar places, plan their journeys more easily, and share practical knowledge
+                        with others.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</body>
+
+</html>

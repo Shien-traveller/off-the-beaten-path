@@ -1,0 +1,25 @@
+<head>
+    <title>New Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="post-detail">
+        <h1>{{ post.title }}</h1>
+
+        <p>{{ post.country }} · {{ post.city }}</p>
+
+        {% if post.images %}
+            <div class="post-images">
+                {% for image in post.images.split(',') %}
+                    <img src="{{ url_for('static', filename='images/uploads/' + image) }}">
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+        <p>{{ post.content }}</p>
+    </div>
+</body>
+
+</html>

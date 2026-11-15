@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <a href="{{ url_for('home') }}" class="site-logo">
+            Off the Beaten Path
+        </a>
+
+        <nav class="top-nav">
+
+            <a href="{{ url_for('about') }}">About</a>
+
+            {% if session.get("username") %}
+
+            <div class="user-menu">
+
+                <button class="avatar-button">
+
+                    {% if session.get("username") == "Shien2" %}
+                    <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                    {% endif %}
+
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="{{ url_for('admin_new_post') }}">New Post</a>
+                    <a href="{{ url_for('manage_posts') }}">My Posts</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{{ url_for('login') }}">ログイン</a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+
+    <div class="admin-page">
+
+        <a href="{{ url_for('manage_posts') }}" class="admin-back">
+            ← Back to My Posts
+        </a>
+
+        <h1>Edit Post</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <label>Title</label>
+            <input type="text" name="title" value="{{ post.title }}" required>
+
+            <br><br>
+
+            <label>Content</label>
+            <textarea name="content" required>{{ post.content }}</textarea>
+
+            <br><br>
+
+            <label>Country</label>
+
+            <select name="country" id="country" required>
+                <option value="Iran" {% if post.country=="Iran" %}selected{% endif %}>Iran</option>
+                <option value="Armenia" {% if post.country=="Armenia" %}selected{% endif %}>Armenia</option>
+                <option value="Georgia" {% if post.country=="Georgia" %}selected{% endif %}>Georgia</option>
+                <option value="Azerbaijan" {% if post.country=="Azerbaijan" %}selected{% endif %}>Azerbaijan</option>
+                <option value="Kazakhstan" {% if post.country=="Kazakhstan" %}selected{% endif %}>Kazakhstan</option>
+                <option value="Uzbekistan" {% if post.country=="Uzbekistan" %}selected{% endif %}>Uzbekistan</option>
+                <option value="Japan" {% if post.country=="Japan" %}selected{% endif %}>Japan</option>
+                <option value="Thailand" {% if post.country=="Thailand" %}selected{% endif %}>Thailand</option>
+                <option value="Cambodia" {% if post.country=="Cambodia" %}selected{% endif %}>Cambodia</option>
+                <option value="Malaysia" {% if post.country=="Malaysia" %}selected{% endif %}>Malaysia</option>
+                <option value="Egypt" {% if post.country=="Egypt" %}selected{% endif %}>Egypt</option>
+            </select>
+
+            <br><br>
+
+            <label>City / Region</label>
+
+            <select name="city" id="city" required>
+            </select>
+
+            <br><br>
+
+            <label>Categories</label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Places" {% if "Places" in post.categories %}checked{%
+                    endif %}>
+                Places
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Foods" {% if "Foods" in post.categories %}checked{%
+                    endif %}>
+                Foods
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Stays" {% if "Stays" in post.categories %}checked{%
+                    endif %}>
+                Stays
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Routes" {% if "Routes" in post.categories %}checked{%
+                    endif %}>
+                Routes
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Tips & Others" {% if 'Tips & Others' in post.categories
+                    %}checked{% endif %}>
+                Tips & Others
+            </label>
+
+            <br><br>
+
+            <label>Photos</label>
+
+            <div class="photo-manager">
+
+                <div id="photo-preview" class="photo-preview">
+                </div>
+
+                <label for="image-input" class="photo-add-button">
+                    +
+                </label>
+
+                <input type="file" id="image-input" name="images" accept="image/*" multiple hidden>
+
+            </div>
+
+            <p class="photo-help">
+                Add, remove, or drag photos to reorder.
+            </p>
+
+            <input type="hidden" name="photo_order" id="photo-order">
+
+            <br>
+
+            <button type="submit" class="submit-button">
+                Save Changes
+            </button>
+
+        </form>
+
+    </div>
+
+    <script>
+        const citiesByCountry = {
+            Iran: [
+                "Tehran",
+                "Isfahan",
+                "Shiraz",
+                "Tabriz",
+                "Mashhad",
+                "Yazd",
+                "Kerman",
+                "Qom",
+                "Kashan",
+                "Other areas"
+            ],
+
+            Armenia: [
+                "Yerevan",
+                "Gyumri",
+                "Goris",
+                "Other areas"
+            ],
+
+            Georgia: [
+                "Tbilisi",
+                "Sighnaghi",
+                "Kutaisi",
+                "Zugdidi",
+                "Batumi",
+                "Mestia",
+                "Other areas"
+            ],
+
+            Azerbaijan: [
+                "Baku",
+                "Ganja",
+                "Sheki",
+                "Other areas"
+            ],
+
+            Kazakhstan: [
+                "Almaty",
+                "Astana",
+                "Shymkent",
+                "Turkistan",
+                "Atyrau",
+                "Aktau",
+                "Other areas"
+            ],
+
+            Uzbekistan: [
+                "Tashkent",
+                "Samarkand",
+                "Bukhara",
+                "Khiva",
+                "Nukus",
+                "Fergana",
+                "Urgench",
+                "Shahrisabz",
+                "Other areas"
+            ],
+
+            Japan: [
+                "Hokkaido",
+                "Akita",
+                "Niigata",
+                "Nagano",
+                "Tokyo",
+                "Ishikawa",
+                "Aichi",
+                "Kyoto",
+                "Nara",
+                "Osaka",
+                "Hyogo",
+                "Okayama",
+                "Hiroshima",
+                "Fukuoka",
+                "Oita",
+                "Kumamoto",
+                "Miyazaki",
+                "Okinawa",
+                "Other prefectures"
+            ],
+
+            Thailand: [
+                "Bangkok",
+                "Chiang Mai",
+                "Chiang Rai",
+                "Ayutthaya",
+                "Chumphon",
+                "Krabi",
+                "Hat Yai",
+                "Betong",
+                "Other areas"
+            ],
+
+            Cambodia: [
+                "Phnom Penh",
+                "Siem Reap",
+                "Battambang",
+                "Kampot",
+                "Sihanoukville",
+                "Other areas"
+            ],
+
+            Malaysia: [
+                "Kuala Lumpur",
+                "Penang",
+                "Ipoh",
+                "Malacca",
+                "Johor Bahru",
+                "Kota Bharu",
+                "Kuching",
+                "Kota Kinabalu",
+                "Other areas"
+            ],
+
+            Egypt: [
+                "Cairo",
+                "Alexandria",
+                "Marsa Matruh",
+                "Luxor",
+                "Aswan",
+                "Hurghada",
+                "Dahab",
+                "Other areas"
+            ]
+        };
+
+        const countrySelect = document.getElementById("country");
+        const citySelect = document.getElementById("city");
+
+        const currentCity = {{ post.city | tojson }};
+
+        function updateCities(selectedCity = null) {
+            const selectedCountry = countrySelect.value;
+            const cities = citiesByCountry[selectedCountry];
+
+            citySelect.innerHTML = "";
+
+            if (cities) {
+                cities.forEach(function (city) {
+                    const option = document.createElement("option");
+
+                    option.value = city;
+                    option.textContent = city;
+
+                    if (city === selectedCity) {
+                        option.selected = true;
+                    }
+
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        countrySelect.addEventListener("change", function () {
+            updateCities();
+        });
+
+        updateCities(currentCity);
+        // ===== Edit Photo Manager =====
+
+        const imageInput = document.getElementById("image-input");
+        const photoPreview = document.getElementById("photo-preview");
+        const photoOrderInput = document.getElementById("photo-order");
+
+        const existingImages = {{ (post.images.split(",") if post.images else[]) | tojson }};
+
+        let photoItems = [];
+
+        existingImages.forEach(function (filename) {
+            photoItems.push({
+                type: "old",
+                filename: filename
+            });
+        });
+
+        renderPhotos();
+        imageInput.addEventListener("change", function () {
+
+            const newFiles = Array.from(imageInput.files);
+
+            newFiles.forEach(function (file) {
+
+                photoItems.push({
+                    type: "new",
+                    file: file
+                });
+
+            });
+
+            renderPhotos();
+        });
+
+        function renderPhotos() {
+
+            photoPreview.innerHTML = "";
+
+            photoItems.forEach(function (item, index) {
+
+                const photoItem = document.createElement("div");
+                photoItem.className = "photo-item";
+
+                photoItem.draggable = true;
+                photoItem.dataset.index = index;
+
+                const img = document.createElement("img");
+
+                if (item.type === "old") {
+                    img.src = "/static/images/uploads/" + item.filename;
+                } else {
+                    img.src = URL.createObjectURL(item.file);
+                }
+
+                const removeButton = document.createElement("button");
+
+                removeButton.type = "button";
+                removeButton.className = "photo-remove";
+                removeButton.textContent = "×";
+
+                removeButton.addEventListener("click", function () {
+
+                    photoItems.splice(index, 1);
+
+                    renderPhotos();
+                });
+
+                photoItem.appendChild(img);
+                photoItem.appendChild(removeButton);
+
+                photoPreview.appendChild(photoItem);
+            });
+
+            updatePhotoOrder();
+        }
+
+        let draggedIndex = null;
+
+        photoPreview.addEventListener("dragstart", function (event) {
+
+            const photoItem = event.target.closest(".photo-item");
+
+            if (!photoItem) {
+                return;
+            }
+
+            draggedIndex = Number(photoItem.dataset.index);
+        });
+
+        photoPreview.addEventListener("dragover", function (event) {
+            event.preventDefault();
+        });
+
+        photoPreview.addEventListener("drop", function (event) {
+
+            event.preventDefault();
+
+            const targetItem = event.target.closest(".photo-item");
+
+            if (!targetItem || draggedIndex === null) {
+                return;
+            }
+
+            const targetIndex = Number(targetItem.dataset.index);
+
+            const movedPhoto = photoItems.splice(draggedIndex, 1)[0];
+
+            photoItems.splice(targetIndex, 0, movedPhoto);
+
+            draggedIndex = null;
+
+            renderPhotos();
+        });
+
+        function updatePhotoOrder() {
+
+            const dataTransfer = new DataTransfer();
+
+            let newImageIndex = 0;
+
+            const order = photoItems.map(function (item) {
+
+                if (item.type === "old") {
+
+                    return {
+                        type: "old",
+                        filename: item.filename
+                    };
+
+                } else {
+
+                    dataTransfer.items.add(item.file);
+
+                    const orderItem = {
+                        type: "new",
+                        index: newImageIndex
+                    };
+
+                    newImageIndex++;
+
+                    return orderItem;
+                }
+            });
+
+            imageInput.files = dataTransfer.files;
+
+            photoOrderInput.value = JSON.stringify(order);
+        }
+    </script>
+
+</body>
+
+</html>

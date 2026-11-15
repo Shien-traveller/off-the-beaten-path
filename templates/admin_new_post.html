@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>New Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <a href="{{ url_for('home') }}" class="site-logo">
+            Off the Beaten Path
+        </a>
+
+        <nav class="top-nav">
+
+            <a href="{{ url_for('about') }}">About</a>
+
+            {% if session.get("username") %}
+
+            <div class="user-menu">
+
+                <button class="avatar-button">
+
+                    {% if session.get("username") == "Shien2" %}
+                    <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                    {% endif %}
+
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="{{ url_for('admin_new_post') }}">New Post</a>
+                    <a href="{{ url_for('manage_posts') }}">Manage Posts</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{{ url_for('login') }}">ログイン</a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+    <div class="admin-page">
+
+        <h1>Admin - New Post</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <label>Title</label>
+            <input type="text" name="title">
+
+            <br><br>
+
+            <label>Content</label>
+            <br>
+            <textarea name="content" rows="10" cols="60"></textarea>
+
+            <br><br>
+
+            <label>Country</label>
+            <select name="country" id="country">
+                <option value="Iran">Iran</option>
+                <option value="Armenia">Armenia</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Azerbaijan">Azerbaijan</option>
+                <option value="Kazakhstan">Kazakhstan</option>
+                <option value="Uzbekistan">Uzbekistan</option>
+                <option value="Japan">Japan</option>
+                <option value="Thailand">Thailand</option>
+                <option value="Cambodia">Cambodia</option>
+                <option value="Malaysia">Malaysia</option>
+                <option value="Egypt">Egypt</option>
+            </select>
+
+            <br><br>
+
+            <label>City / Region</label>
+
+            <select name="city" id="city">
+            </select>
+
+
+            <br><br>
+
+            <label>Categories</label>
+            <br>
+
+            <label>
+                <input type="checkbox" name="categories" value="Places">
+                Places
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Foods">
+                Foods
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Stays">
+                Stays
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Routes">
+                Routes
+            </label>
+
+            <label>
+                <input type="checkbox" name="categories" value="Tips & Others">
+                Tips & Others
+            </label>
+
+            <br><br>
+
+            <label>Photos</label>
+
+            <div class="photo-manager">
+
+                <div id="photo-preview" class="photo-preview">
+                </div>
+
+                <label for="image-input" class="photo-add-button">
+                    +
+                </label>
+
+                <input type="file" id="image-input" name="images" accept="image/*" multiple hidden>
+
+            </div>
+
+            <p class="photo-help">
+                Add photos one by one. Drag to reorder.
+            </p>
+
+            <br>
+
+            <button type="submit" class="submit-button">
+                Publish
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const citiesByCountry = {
+            Iran: [
+                "Tehran",
+                "Isfahan",
+                "Shiraz",
+                "Tabriz",
+                "Mashhad",
+                "Yazd",
+                "Kerman",
+                "Qom",
+                "Kashan",
+                "Other areas"
+            ],
+
+            Armenia: [
+                "Yerevan",
+                "Gyumri",
+                "Goris",
+                "Other areas"
+            ],
+
+            Georgia: [
+                "Tbilisi",
+                "Sighnaghi",
+                "Kutaisi",
+                "Zugdidi",
+                "Batumi",
+                "Mestia",
+                "Other areas"
+            ],
+
+            Azerbaijan: [
+                "Baku",
+                "Ganja",
+                "Sheki",
+                "Other areas"
+            ],
+
+            Kazakhstan: [
+                "Almaty",
+                "Astana",
+                "Shymkent",
+                "Turkistan",
+                "Atyrau",
+                "Aktau",
+                "Other areas"
+            ],
+
+            Uzbekistan: [
+                "Tashkent",
+                "Samarkand",
+                "Bukhara",
+                "Khiva",
+                "Nukus",
+                "Fergana",
+                "Urgench",
+                "Shahrisabz",
+                "Other areas"
+            ],
+
+            Japan: [
+                "Hokkaido",
+                "Akita",
+                "Niigata",
+                "Nagano",
+                "Tokyo",
+                "Ishikawa",
+                "Aichi",
+                "Kyoto",
+                "Nara",
+                "Osaka",
+                "Hyogo",
+                "Okayama",
+                "Hiroshima",
+                "Fukuoka",
+                "Oita",
+                "Kumamoto",
+                "Miyazaki",
+                "Okinawa",
+                "Other prefectures"
+            ],
+
+            Thailand: [
+                "Bangkok",
+                "Chiang Mai",
+                "Chiang Rai",
+                "Ayutthaya",
+                "Chumphon",
+                "Krabi",
+                "Hat Yai",
+                "Betong",
+                "Other areas"
+            ],
+
+            Cambodia: [
+                "Phnom Penh",
+                "Siem Reap",
+                "Battambang",
+                "Kampot",
+                "Sihanoukville",
+                "Other areas"
+            ],
+
+            Malaysia: [
+                "Kuala Lumpur",
+                "Penang",
+                "Ipoh",
+                "Malacca",
+                "Johor Bahru",
+                "Kota Bharu",
+                "Kuching",
+                "Kota Kinabalu",
+                "Other areas"
+            ],
+
+            Egypt: [
+                "Cairo",
+                "Alexandria",
+                "Marsa Matruh",
+                "Luxor",
+                "Aswan",
+                "Hurghada",
+                "Dahab",
+                "Other areas"
+            ]
+        };
+
+        const countrySelect = document.getElementById("country");
+        const citySelect = document.getElementById("city");
+
+        function updateCities() {
+            const selectedCountry = countrySelect.value;
+            const cities = citiesByCountry[selectedCountry];
+
+            citySelect.innerHTML = "";
+
+            if (cities) {
+                cities.forEach(function (city) {
+                    const option = document.createElement("option");
+
+                    option.value = city;
+                    option.textContent = city;
+
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        countrySelect.addEventListener("change", updateCities);
+
+        updateCities();
+
+        // ===== Photo Manager =====
+
+        const imageInput = document.getElementById("image-input");
+        const photoPreview = document.getElementById("photo-preview");
+
+        let selectedImages = [];
+
+        imageInput.addEventListener("change", function () {
+
+            const newFiles = Array.from(imageInput.files);
+
+            selectedImages = selectedImages.concat(newFiles);
+
+            renderPhotos();
+        });
+
+        function renderPhotos() {
+
+            photoPreview.innerHTML = "";
+
+            selectedImages.forEach(function (file, index) {
+
+                const photoItem = document.createElement("div");
+                photoItem.className = "photo-item";
+
+                photoItem.draggable = true;
+                photoItem.dataset.index = index;
+
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "photo-remove";
+                removeButton.textContent = "×";
+
+                removeButton.addEventListener("click", function () {
+                    selectedImages.splice(index, 1);
+                    renderPhotos();
+                });
+
+                photoItem.appendChild(img);
+                photoItem.appendChild(removeButton);
+
+                photoPreview.appendChild(photoItem);
+            });
+
+            updateImageInput();
+        }
+        let draggedIndex = null;
+
+        photoPreview.addEventListener("dragstart", function (event) {
+            const photoItem = event.target.closest(".photo-item");
+
+            if (!photoItem) {
+                return;
+            }
+
+            draggedIndex = Number(photoItem.dataset.index);
+        });
+
+        photoPreview.addEventListener("dragover", function (event) {
+            event.preventDefault();
+        });
+
+        photoPreview.addEventListener("drop", function (event) {
+            event.preventDefault();
+
+            const targetItem = event.target.closest(".photo-item");
+
+            if (!targetItem || draggedIndex === null) {
+                return;
+            }
+
+            const targetIndex = Number(targetItem.dataset.index);
+
+            const movedImage = selectedImages.splice(draggedIndex, 1)[0];
+
+            selectedImages.splice(targetIndex, 0, movedImage);
+
+            draggedIndex = null;
+
+            renderPhotos();
+        });
+        function updateImageInput() {
+
+            const dataTransfer = new DataTransfer();
+
+            selectedImages.forEach(function (file) {
+                dataTransfer.items.add(file);
+            });
+
+            imageInput.files = dataTransfer.files;
+        }
+    </script>
+</body>
+
+</html>

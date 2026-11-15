@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ country_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <a href="{{ url_for('home') }}" class="site-logo">
+            Off the Beaten Path
+        </a>
+
+        <nav class="top-nav">
+
+            <a href="{{ url_for('about') }}">About</a>
+
+            {% if session.get("username") %}
+
+            <div class="user-menu">
+
+                <button class="avatar-button">
+
+                    {% if session.get("username") == "Shien2" %}
+                    <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                    {% endif %}
+
+                </button>
+
+
+                <div class="user-dropdown">
+                    <a href="{{ url_for('admin_new_post') }}">New Post</a>
+                    <a href="{{ url_for('manage_posts') }}">Manage Posts</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{{ url_for('login') }}">ログイン</a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+
+    <section class="hero country-hero"
+        style="background-image: url('{{ url_for('static', filename='images/' + hero_image) }}');">
+
+        <div class="country-hero-text">
+            <h1>{{ country_name }}</h1>
+            <p>{{ hero_tagline }}</p>
+        </div>
+
+    </section>
+
+
+    <main class="destination">
+
+        <div class="sidebar-wrapper">
+
+            <p class="sidebar-title">BROWSE BY REGION</p>
+            <aside class="sidebar">
+
+                <a href="{{ url_for(request.endpoint, category=selected_category) }}" {% if not selected_city
+                    %}class="active" {% endif %}>
+                    All cities
+                </a>
+
+                {% for region in regions %}
+                <a href="{{ url_for(request.endpoint, city=region, category=selected_category) }}" {% if
+                    selected_city==region %}class="active" {% endif %}>
+                    {{ region }}
+                </a>
+                {% endfor %}
+
+                <a href="{{ url_for(request.endpoint, city='Other areas', category=selected_category) }}" {% if
+                    selected_city=="Other areas" %}class="active" {% endif %}>
+                    Other areas
+                </a>
+
+            </aside>
+        </div>
+
+        <section class="country-area">
+            <p class="filter-title">BROWSE BY NOTE TYPE</p>
+
+            <div class="country-filters">
+
+                <a href="{{ url_for(request.endpoint, city=selected_city) }}" {% if not selected_category
+                    %}class="active" {% endif %}>
+                    All
+                </a>
+
+                <a href="{{ url_for(request.endpoint, city=selected_city, category='Places') }}" {% if
+                    selected_category=="Places" %}class="active" {% endif %}>
+                    Places
+                </a>
+
+                <a href="{{ url_for(request.endpoint, city=selected_city, category='Foods') }}" {% if
+                    selected_category=="Foods" %}class="active" {% endif %}>
+                    Foods
+                </a>
+
+                <a href="{{ url_for(request.endpoint, city=selected_city, category='Stays') }}" {% if
+                    selected_category=="Stays" %}class="active" {% endif %}>
+                    Stays
+                </a>
+
+                <a href="{{ url_for(request.endpoint, city=selected_city, category='Routes') }}" {% if
+                    selected_category=="Routes" %}class="active" {% endif %}>
+                    Routes
+                </a>
+
+                <a href="{{ url_for(request.endpoint, city=selected_city, category='Tips & Others') }}" {% if
+                    selected_category=="Tips & Others" %}class="active" {% endif %}>
+                    Tips & Others
+                </a>
+
+            </div>
+
+            <div class="notes-count-row">
+                <span>{{ posts|length }} notes</span>
+            </div>
+
+            <div class="country-post-area">
+
+                <div class="post-grid">
+
+                    {% if posts %}
+
+                    {% for post in posts %}
+
+                    <div class="post-card" data-title="{{ post.title }}" data-content="{{ post.content }}"
+                        data-city="{{ post.city }}" data-categories="{{ post.categories }}"
+                        data-images="{{ post.images }}" data-author="{{ post.author }}">
+
+                        {% if post.images %}
+                        <img class="post-card-image"
+                            src="{{ url_for('static', filename='images/uploads/' + post.images.split(',')[0]) }}"
+                            alt="{{ post.title }}">
+                        {% else %}
+                        <div class="post-card-image post-card-no-image">
+                            No image
+                        </div>
+                        {% endif %}
+
+                        <div class="post-card-body">
+
+                            <div class="post-tags">
+
+                                {% for category in post.categories.split(',') %}
+                                {% if category %}
+                                <span class="post-tag">
+                                    {{ category }}
+                                </span>
+                                {% endif %}
+                                {% endfor %}
+
+                                <span class="post-tag">
+                                    {{ post.city }}
+                                </span>
+
+                            </div>
+
+                            <h3>{{ post.title }}</h3>
+
+                            <div class="post-card-author">
+
+                                {% if post.author == "Shien2" %}
+                                <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                                {% endif %}
+
+                                <span>{{ post.author }}</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                    {% else %}
+
+                    <p>No posts yet.</p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="post-modal" class="post-modal">
+
+        <div class="post-modal-content">
+
+            <div class="post-modal-left">
+
+                <button id="prev-image" class="carousel-button carousel-left">
+                    ◀
+                </button>
+
+                <img id="modal-image" src="" alt="">
+
+                <button id="next-image" class="carousel-button carousel-right">
+                    ▶
+                </button>
+
+                <div id="image-counter" class="image-counter"></div>
+
+            </div>
+
+            <div class="post-modal-right">
+
+                <div class="modal-author">
+
+                    <img id="modal-author-avatar" src="" alt="">
+
+                    <span id="modal-author-name"></span>
+
+                </div>
+
+                <div class="post-info">
+                    <h2 id="modal-title"></h2>
+
+                    <div id="modal-tags" class="modal-tags"></div>
+
+                    <div id="modal-content"></div>
+                </div>
+
+                <div class="comments-section">
+                    <h3>Comments</h3>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const modal = document.getElementById("post-modal");
+        const postCards = document.querySelectorAll(".post-card");
+        const modalImage = document.getElementById("modal-image");
+
+        const modalAuthorName = document.getElementById("modal-author-name");
+        const modalAuthorAvatar = document.getElementById("modal-author-avatar");
+
+        let currentImages = [];
+        let currentImageIndex = 0;
+
+        function renderModalContent(content) {
+            const container = document.getElementById("modal-content");
+
+            container.innerHTML = "";
+
+            const paragraphs = content.split(/\n\s*\n/);
+
+            paragraphs.forEach(function (paragraph) {
+                const p = document.createElement("p");
+
+                const lines = paragraph.split("\n");
+
+                lines.forEach(function (line, index) {
+                    p.appendChild(document.createTextNode(line));
+
+                    if (index < lines.length - 1) {
+                        p.appendChild(document.createElement("br"));
+                    }
+                });
+
+                container.appendChild(p);
+            });
+        }
+
+        postCards.forEach(function (card) {
+            card.addEventListener("click", function () {
+                const title = card.dataset.title;
+                const content = card.dataset.content;
+                const city = card.dataset.city;
+                const categories = card.dataset.categories;
+                const images = card.dataset.images;
+                const author = card.dataset.author;
+
+                document.getElementById("modal-title").textContent = title;
+                renderModalContent(content);
+                const modalTags = document.getElementById("modal-tags");
+
+                modalTags.innerHTML = "";
+
+                categories.split(",").forEach(function (category) {
+                    if (category.trim()) {
+                        const tag = document.createElement("span");
+                        tag.className = "modal-tag";
+                        tag.textContent = category.trim();
+                        modalTags.appendChild(tag);
+                    }
+                });
+
+                if (city) {
+                    const cityTag = document.createElement("span");
+                    cityTag.className = "modal-tag";
+                    cityTag.textContent = city;
+                    modalTags.appendChild(cityTag);
+                }
+
+                modalAuthorName.textContent = author;
+
+                if (author === "Shien2") {
+                    modalAuthorAvatar.src = "{{ url_for('static', filename='images/shien2.jpeg') }}";
+                } else {
+                    modalAuthorAvatar.src = "{{ url_for('static', filename='images/shien.jpg') }}";
+                }
+
+                if (images) {
+                    currentImages = images.split(",");
+                    currentImageIndex = 0;
+
+                    modalImage.src =
+                        "/static/images/uploads/" + currentImages[currentImageIndex];
+
+                    modalImage.style.display = "block";
+                    showImage();
+                } else {
+                    currentImages = [];
+                    currentImageIndex = 0;
+                    modalImage.style.display = "none";
+                }
+
+                modal.classList.add("show");
+            });
+        });
+
+        const prevButton = document.getElementById("prev-image");
+        const nextButton = document.getElementById("next-image");
+        const imageCounter = document.getElementById("image-counter");
+
+        function showImage() {
+            if (currentImages.length === 0) {
+                return;
+            }
+
+            modalImage.src =
+                "/static/images/uploads/" + currentImages[currentImageIndex];
+
+            imageCounter.textContent =
+                (currentImageIndex + 1) + " / " + currentImages.length;
+        }
+
+        nextButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            if (currentImages.length === 0) {
+                return;
+            }
+
+            if (currentImageIndex < currentImages.length - 1) {
+                currentImageIndex++;
+                showImage();
+            }
+        });
+
+        prevButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            if (currentImages.length === 0) {
+                return;
+            }
+
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                showImage();
+            }
+        });
+
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.classList.remove("show");
+            }
+        });
+        // 帖子卡片的标签只显示一行
+        document.querySelectorAll(".post-tags").forEach(function (container) {
+
+            // 如果本来一行就放得下，什么都不做
+            if (container.scrollWidth <= container.clientWidth) {
+                return;
+            }
+
+            // 创建 ... 胶囊
+            const moreTag = document.createElement("span");
+            moreTag.className = "post-tag post-tag-more";
+            moreTag.textContent = "...";
+
+            container.appendChild(moreTag);
+
+            // 原来的所有标签
+            const tags = Array.from(
+                container.querySelectorAll(".post-tag:not(.post-tag-more)")
+            );
+
+            // 一直删掉最后一个标签，直到 ... 也能放进一行
+            while (
+                container.scrollWidth > container.clientWidth &&
+                tags.length > 0
+            ) {
+                const lastTag = tags.pop();
+                lastTag.remove();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

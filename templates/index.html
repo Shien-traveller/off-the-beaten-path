@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Off the Beaten Path</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <a href="{{ url_for('home') }}" class="site-logo">
+            Off the Beaten Path
+        </a>
+
+        <nav class="top-nav">
+
+            <a href="{{ url_for('about') }}">About</a>
+
+            {% if session.get("username") %}
+
+            <div class="user-menu">
+
+                <button class="avatar-button">
+
+                    {% if session.get("username") == "Shien2" %}
+                    <img src="{{ url_for('static', filename='images/shien2.jpeg') }}" alt="Shien2">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/shien.jpg') }}" alt="Shien">
+                    {% endif %}
+
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="{{ url_for('admin_new_post') }}">New Post</a>
+                    <a href="{{ url_for('manage_posts') }}">Manage Posts</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <a href="{{ url_for('login') }}">ログイン</a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+    <div class="hero">
+        <p>TRAVEL LIGHT · GO DEEP</p>
+        <h1 class="main-hero-title">Go where the guidebooks don't</h1>
+        <p class="main-hero-description">
+            Practical travel knowledge, shared by travelers
+        </p>
+    </div>
+    <div class="destination">
+
+        <div class="sidebar-wrapper">
+            <p class="sidebar-title">DESTINATION LIBRARY</p>
+
+            <div class="sidebar">
+                <a href="#" class="region-filter active" data-region="all">All countries</a>
+
+                <a href="#" class="region-filter" data-region="europe">EUROPE</a>
+
+                <a href="#" class="region-filter" data-region="africa">AFRICA</a>
+
+                <a href="#" class="region-filter" data-region="west-asia">WEST ASIA</a>
+
+                <a href="#" class="region-filter" data-region="central-asia">CENTRAL ASIA</a>
+
+                <a href="#" class="region-filter" data-region="south-asia">SOUTH ASIA</a>
+
+                <a href="#" class="region-filter" data-region="east-southeast-asia">
+                    EAST & SOUTHEAST ASIA
+                </a>
+
+                <a href="#" class="region-filter" data-region="oceania">OCEANIA</a>
+
+                <a href="#" class="region-filter" data-region="north-america">NORTH AMERICA</a>
+
+                <a href="#" class="region-filter" data-region="latin-america">LATIN AMERICA</a>
+            </div>
+        </div>
+
+        <div class="country-area">
+            <div class="section-heading">
+                <h2>Where will you wander next?</h2>
+
+                {% if countries %}
+                <span class="item-count">{{ countries|length }} countries</span>
+                {% endif %}
+            </div>
+            {% if countries %}
+            <div class="country-grid">
+                {% for country in countries %}
+                {% if country.url %}
+                <a href="{{ country.url }}" class="country-card" data-region="{{ country.region }}">
+                    <img src="{{ url_for('static', filename='images/' + country.image) }}" alt="{{ country.name }}">
+
+                    <div class="country-card-body">
+                        <h3>{{ country.name }}</h3>
+                    </div>
+                </a>
+                {% else %}
+                <div class="country-card" data-region="{{ country.region }}">
+                    <img src="{{ url_for('static', filename='images/' + country.image) }}" alt="{{ country.name }}">
+
+                    <div class="country-card-body">
+                        <h3>{{ country.name }}</h3>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <script>
+        const filterButtons = document.querySelectorAll(".region-filter");
+        const countryCards = document.querySelectorAll(".country-card");
+
+        filterButtons.forEach(function (button) {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                filterButtons.forEach(function (btn) {
+                    btn.classList.remove("active");
+                });
+
+                button.classList.add("active");
+
+                const selectedRegion = button.dataset.region;
+
+                countryCards.forEach(function (card) {
+                    if (selectedRegion === "all" || card.dataset.region === selectedRegion) {
+                        card.style.display = "block";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
